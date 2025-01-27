@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arvauspeli</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f8ff;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Arvaa luku!</h1>
+  <p>Arvaa luku välillä 1-100:</p>
+  <input type="number" id="guess" placeholder="Syötä arvauksesi" />
+  <button onclick="checkGuess()">Arvaa</button>
+  <button onclick="restartGame()">Aloita alusta</button>
+
+  <div class="message" id="message"></div>
+
+  <script>
+    let randomNumber = Math.floor(Math.random() * 100) + 1;
+    let attempts = 0;
+
+    function checkGuess() {
+      const userGuess = Number(document.getElementById('guess').value);
+      const message = document.getElementById('message');
+      attempts++;
+
+      if (userGuess === randomNumber) {
+        message.innerHTML = `🎉 Oikein! Arvasit luvun ${randomNumber} ${attempts} yrityksellä!`;
+        message.style.color = 'green';
+      } else if (userGuess < randomNumber) {
+        message.innerHTML = '📉 Liian pieni! Yritä uudelleen.';
+        message.style.color = 'blue';
+      } else if (userGuess > randomNumber) {
+        message.innerHTML = '📈 Liian suuri! Yritä uudelleen.';
+        message.style.color = 'orange';
+      }
+    }
+
+    function restartGame() {
+      randomNumber = Math.floor(Math.random() * 100) + 1;
+      attempts = 0;
+      document.getElementById('guess').value = '';
+      document.getElementById('message').innerHTML = '';
+    }
+  </script>
+</body>
+</html>
