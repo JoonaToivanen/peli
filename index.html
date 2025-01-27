@@ -93,7 +93,9 @@
       if (gameActive) {
         currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
         createBoard();
-        if (isAIPlaying && currentPlayer === 'O') aiMove();
+        if (isAIPlaying && currentPlayer === 'O') {
+          setTimeout(aiMove, 500); // Add delay for AI move
+        }
       }
     }
 
