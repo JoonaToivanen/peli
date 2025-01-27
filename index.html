@@ -100,18 +100,38 @@
     }
 
     function aiMove() {
-      // Simple AI: Pick the first available spot
-      const availableSpots = board.map((cell, index) => (cell === '' ? index : null)).filter(index => index !== null);
-      if (availableSpots.length > 0) {
-        const randomIndex = Math.floor(Math.random() * availableSpots.length);
-        const aiChoice = availableSpots[randomIndex];
-        board[aiChoice] = 'O';
+      // Check if AI can win or block the player from winning
+      let move = findBestMove('O') || findBestMove('X');
+
+      // If no immediate threat or win, pick a random spot
+      if (move === null) {
+        const availableSpots = board.map((cell, index) => (cell === '' ? index : null)).filter(index => index !== null);
+        if (availableSpots.length > 0) {
+          move = availableSpots[Math.floor(Math.random() * availableSpots.length)];
+        }
+      }
+
+      if (move !== null) {
+        board[move] = 'O';
         checkWinner();
         if (gameActive) {
           currentPlayer = 'X';
           createBoard();
         }
       }
+    }
+
+    function findBestMove(player) {
+      for (let combination of winningCombinations) {
+        const [a, b, c] = combination;
+        const values = [board[a], board[b], board[c]];
+
+        // Check if two cells are occupied by the player and the third is empty
+        if (values.filter(v => v === player).length === 2 && values.includes('')) {
+          return combination[values.indexOf('')];
+        }
+      }
+      return null;
     }
 
     function checkWinner() {
