@@ -59,11 +59,13 @@
   <div class="board" id="board"></div>
   <div class="message" id="message"></div>
   <button onclick="restartGame()">Aloita alusta</button>
+  <button onclick="playAgainstAI()">Pelaa konetta vastaan</button>
 
   <script>
     let board = ['', '', '', '', '', '', '', '', ''];
     let currentPlayer = 'X';
     let gameActive = true;
+    let isAIPlaying = false;
 
     const winningCombinations = [
       [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -88,12 +90,30 @@
       if (board[index] !== '' || !gameActive) return;
       board[index] = currentPlayer;
       checkWinner();
-      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-      createBoard();
+      if (gameActive) {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        createBoard();
+        if (isAIPlaying && currentPlayer === 'O') aiMove();
+      }
+    }
+
+    function aiMove() {
+      // Simple AI: Pick the first available spot
+      const availableSpots = board.map((cell, index) => (cell === '' ? index : null)).filter(index => index !== null);
+      if (availableSpots.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availableSpots.length);
+        const aiChoice = availableSpots[randomIndex];
+        board[aiChoice] = 'O';
+        checkWinner();
+        if (gameActive) {
+          currentPlayer = 'X';
+          createBoard();
+        }
+      }
     }
 
     function checkWinner() {
-      for (let combination of winningCombinations) { 
+      for (let combination of winningCombinations) {
         const [a, b, c] = combination;
         if (board[a] && board[a] === board[b] && board[a] === board[c]) {
           document.getElementById('message').textContent = `🎉 Pelaaja ${board[a]} voitti!`;
@@ -111,8 +131,14 @@
       board = ['', '', '', '', '', '', '', '', ''];
       currentPlayer = 'X';
       gameActive = true;
+      isAIPlaying = false;
       document.getElementById('message').textContent = '';
       createBoard();
+    }
+
+    function playAgainstAI() {
+      restartGame();
+      isAIPlaying = true;
     }
 
     createBoard();
