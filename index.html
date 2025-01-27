@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arvauspeli</title>
+  <title>Tic Tac Toe</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,10 +14,31 @@
     h1 {
       color: #333;
     }
-    input {
-      padding: 10px;
-      font-size: 16px;
-      margin: 10px;
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 5px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+      border: 2px solid #333;
+      font-size: 36px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .cell.taken {
+      pointer-events: none;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 18px;
     }
     button {
       padding: 10px 20px;
@@ -31,49 +52,70 @@
     button:hover {
       background-color: #45a049;
     }
-    .message {
-      margin-top: 20px;
-      font-size: 18px;
-    }
   </style>
 </head>
 <body>
-  <h1>Arvaa luku!</h1>
-  <p>Arvaa luku välillä 1-100:</p>
-  <input type="number" id="guess" placeholder="Syötä arvauksesi" />
-  <button onclick="checkGuess()">Arvaa</button>
+  <h1>Tic Tac Toe</h1>
+  <div class="board" id="board"></div>
+  <div class="message" id="message"></div>
   <button onclick="restartGame()">Aloita alusta</button>
 
-  <div class="message" id="message"></div>
-
   <script>
-    let randomNumber = Math.floor(Math.random() * 100) + 1;
-    let attempts = 0;
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let gameActive = true;
 
-    function checkGuess() {
-      const userGuess = Number(document.getElementById('guess').value);
-      const message = document.getElementById('message');
-      attempts++;
+    const winningCombinations = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
 
-      if (userGuess === randomNumber) {
-        message.innerHTML = `🎉 Oikein! Arvasit luvun ${randomNumber} ${attempts} yrityksellä!`;
-        message.style.color = 'green';
-      } else if (userGuess < randomNumber) {
-        message.innerHTML = '📉 Liian pieni! Yritä uudelleen.';
-        message.style.color = 'blue';
-      } else if (userGuess > randomNumber) {
-        message.innerHTML = '📈 Liian suuri! Yritä uudelleen.';
-        message.style.color = 'orange';
+    function createBoard() {
+      const boardElement = document.getElementById('board');
+      boardElement.innerHTML = '';
+      board.forEach((cell, index) => {
+        const cellElement = document.createElement('div');
+        cellElement.classList.add('cell');
+        if (cell) cellElement.classList.add('taken');
+        cellElement.textContent = cell;
+        cellElement.addEventListener('click', () => makeMove(index));
+        boardElement.appendChild(cellElement);
+      });
+    }
+
+    function makeMove(index) {
+      if (board[index] !== '' || !gameActive) return;
+      board[index] = currentPlayer;
+      checkWinner();
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      createBoard();
+    }
+
+    function checkWinner() {
+      for (let combination of winningCombinations) { 
+        const [a, b, c] = combination;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          document.getElementById('message').textContent = `🎉 Pelaaja ${board[a]} voitti!`;
+          gameActive = false;
+          return;
+        }
+      }
+      if (!board.includes('')) {
+        document.getElementById('message').textContent = 'Tasapeli!';
+        gameActive = false;
       }
     }
 
     function restartGame() {
-      randomNumber = Math.floor(Math.random() * 100) + 1;
-      attempts = 0;
-      document.getElementById('guess').value = '';
-      document.getElementById('message').innerHTML = '';
+      board = ['', '', '', '', '', '', '', '', ''];
+      currentPlayer = 'X';
+      gameActive = true;
+      document.getElementById('message').textContent = '';
+      createBoard();
     }
+
+    createBoard();
   </script>
 </body>
 </html>
-
